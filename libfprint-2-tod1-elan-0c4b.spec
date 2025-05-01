@@ -9,7 +9,7 @@ Summary:        Repackaged driver module binary from Lenovo for Elan 04F3:0C4B f
 
 License:        GPL-3.0
 URL:            https://support.lenovo.com/us/en/downloads/ds560935-elan-fingerprint-driver-for-linux-thinkpad-e14-gen-4-thinkpad-e15-gen-4
-Source0:        https://github.com/isengu/libfprint-2-tod1-elan-0c4b/releases/tag/%{major_version}-%{release_version}.tar.gz
+Source0:        https://github.com/isengu/libfprint-2-tod1-elan-0c4b/archive/refs/tags/%{major_version}-%{release_version}.tar.gz
 
 Requires:       libfprint-tod
 
