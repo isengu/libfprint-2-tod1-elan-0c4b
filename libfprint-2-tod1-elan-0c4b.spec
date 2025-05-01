@@ -32,19 +32,15 @@ mv libfprint-2-tod1-elan-0c4b-%{major_version}/* %{_builddir}/libfprint-2-tod1-e
 install -p -d -m 0755 %{buildroot}%{_libdir}/libfprint-2/tod-1/
 install -m 0644 usr/lib/x86_64-linux-gnu/libfprint-2/tod-1/libfprint-2-tod1-elan.so %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
 
-# Install the OpenSSL 1.1 binary to external directory
-install -p -d -m 0755 %{buildroot}%{_libdir}/libfprint-2/external/
-install -m 0644 external/libcrypto.so.1.1 %{buildroot}%{_libdir}/libfprint-2/external/libcrypto.so.1.1
+# Bundled OpenSSL 1.1 - installed to /usr/lib64 for loader compatibility
+install -m 0644 external/libcrypto.so.1.1 %{buildroot}%{_libdir}/libcrypto.so.1.1
 
 # Install udev rules
 install -p -d -m 0755 %{buildroot}%{_udevrulesdir}
 install -m 0644 lib/udev/rules.d/60-libfprint-2-tod1-elan.rules %{buildroot}%{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
 
-# Patch RPATH to point to the external dir (relative from tod-1)
-patchelf --set-rpath '$ORIGIN/../../external' %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
-
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
-%{_libdir}/libfprint-2/external/libcrypto.so.1.1
+%{_libdir}/libcrypto.so.1.1
 %{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
