@@ -27,21 +27,24 @@ This version includes a bundled OpenSSL 1.1 library for compatibility on distros
 
 %install
 mv libfprint-2-tod1-elan-0c4b-%{major_version}/* %{_builddir}/libfprint-2-tod1-elan-0c4b-%{major_version}-%{release_version}/
+
+# Install the driver
 install -p -d -m 0755 %{buildroot}%{_libdir}/libfprint-2/tod-1/
 install -m 0644 usr/lib/x86_64-linux-gnu/libfprint-2/tod-1/libfprint-2-tod1-elan.so %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
+
+# Install the OpenSSL 1.1 binary to external directory
+install -p -d -m 0755 %{buildroot}%{_libdir}/libfprint-2/external/
+install -m 0644 external/libcrypto.so.1.1 %{buildroot}%{_libdir}/libfprint-2/external/libcrypto.so.1.1
+
+# Install udev rules
 install -p -d -m 0755 %{buildroot}%{_udevrulesdir}
 install -m 0644 lib/udev/rules.d/60-libfprint-2-tod1-elan.rules %{buildroot}%{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
 
-# Bundled OpenSSL 1.1
-install -p -d -m 0755 %{buildroot}/opt/libfprint-elan/
-install -m 0644 external/libcrypto.so.1.1 %{buildroot}/opt/libfprint-elan/libcrypto.so.1.1
-
-# Patch the driver to use RPATH for /opt/libfprint-elan
-patchelf --set-rpath /opt/libfprint-elan \
-    %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
+# Patch RPATH to point to the external dir (relative from tod-1)
+patchelf --set-rpath '$ORIGIN/../../external' %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
 
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
+%{_libdir}/libfprint-2/external/libcrypto.so.1.1
 %{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
-/opt/libfprint-elan/libcrypto.so.1.1
