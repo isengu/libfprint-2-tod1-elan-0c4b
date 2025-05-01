@@ -3,7 +3,6 @@
 %define release_version     1
 
 Name:           libfprint-2-tod1-elan-0c4b
-
 Version:        %{major_version}
 Release:        %{release_version}%{?dist}
 Summary:        Repackaged driver module binary from Lenovo for Elan 04F3:0C4B fingerprint reader
@@ -13,11 +12,15 @@ URL:            https://support.lenovo.com/us/en/downloads/ds560935-elan-fingerp
 Source0:        https://github.com/QuanTrinhCA/libfprint-2-tod1-elan-0c4b/archive/refs/tags/%{major_version}-%{release_version}.tar.gz
 
 Requires:       libfprint-tod
+
 #For installing udev rules
 BuildRequires:  systemd
+#For patching the driver RPATH
+BuildRequires:  patchelf
 
 %description
 Repackaged Elan driver module from Lenovo for fingerprint reader to support 04F3:0C4B.
+This version includes a bundled OpenSSL 1.1 library for compatibility on distros that doesn't include it (e.g. fedora42).
 
 %prep
 %setup -q -n libfprint-2-tod1-elan-0c4b-%{major_version}-%{release_version}
@@ -29,7 +32,16 @@ install -m 0644 usr/lib/x86_64-linux-gnu/libfprint-2/tod-1/libfprint-2-tod1-elan
 install -p -d -m 0755 %{buildroot}%{_udevrulesdir}
 install -m 0644 lib/udev/rules.d/60-libfprint-2-tod1-elan.rules %{buildroot}%{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
 
+# Bundled OpenSSL 1.1
+install -p -d -m 0755 %{buildroot}/opt/libfprint-elan/
+install -m 0644 external/libcrypto.so.1.1 %{buildroot}/opt/libfprint-elan/libcrypto.so.1.1
+
+# Patch the driver to use RPATH for /opt/libfprint-elan
+patchelf --set-rpath /opt/libfprint-elan \
+    %{buildroot}%{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libfprint-2/tod-1/libfprint-2-tod1-elan.so
 %{_udevrulesdir}/60-libfprint-2-tod1-elan.rules
+/opt/libfprint-elan/libcrypto.so.1.1
